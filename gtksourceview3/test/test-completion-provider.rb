@@ -30,4 +30,14 @@ class TestCompletionProvider < Test::Unit::TestCase
   def test_class_size
     assert_equal(GLib::Object.gtype.class_size, MyProvider.gtype.class_size)
   end
+
+  def test_registered_ancestors
+    gtype = MyProvider.gtype
+    assert_include(gtype.ancestors, GLib::Object.gtype)
+  end
+
+  def test_registered_interfaces
+    gtype = MyProvider.gtype
+    assert_include(gtype.interfaces, GtkSource::CompletionProvider.gtype)
+  end
 end
