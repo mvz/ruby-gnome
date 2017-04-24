@@ -1065,18 +1065,24 @@ rbgobj_register_type(VALUE klass, VALUE type_name, GClassInitFunc class_init)
             length = RARRAY_LEN(interface_modules);
 
             for(i = 0; i < length; i++) {
+                GType interface_type;
+                GInterfaceInfo *interface_info;
                 VALUE entry = rb_ary_entry(interface_modules, i);
-                if(entry != rbgobj_mInterface) {
-                    GType interface_type = CLASS2GTYPE(entry);
-                    GInterfaceInfo *interface_info = g_new0(GInterfaceInfo, 1);
 
-                    interface_info->interface_init     = NULL;
-                    interface_info->interface_finalize = NULL;
-                    interface_info->interface_data     = NULL;
+                if(rb_class_inherited_p(entry, rbgobj_mInterface) != Qtrue)
+                    continue;
+                if(entry == rbgobj_mInterface)
+                    continue;
 
-                    g_type_add_interface_static(type, interface_type, interface_info);
-                }
-            };
+                interface_type = CLASS2GTYPE(entry);
+                interface_info = g_new0(GInterfaceInfo, 1);
+
+                interface_info->interface_init     = NULL;
+                interface_info->interface_finalize = NULL;
+                interface_info->interface_data     = NULL;
+
+                g_type_add_interface_static(type, interface_type, interface_info);
+            }
         }
 
         {

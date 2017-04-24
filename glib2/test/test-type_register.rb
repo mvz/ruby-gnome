@@ -17,27 +17,41 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class TestTypeRegister < Test::Unit::TestCase
-  class MyClass < GLib::Object
-    include GLib::TypePlugin
+  include GLibTestUtils
 
-    type_register
+  sub_test_case "register include GType interfaces" do
+    class MyClass < GLib::Object
+      include GLib::TypePlugin
+
+      type_register
+    end
+
+    def test_class_size
+      assert_equal(GLib::Object.gtype.class_size, MyClass.gtype.class_size)
+    end
+
+    def test_registered_ancestors
+      gtype = MyClass.gtype
+      assert_include(gtype.ancestors, GLib::Object.gtype)
+    end
+
+    def test_registered_interfaces
+      gtype = MyClass.gtype
+      assert_include(gtype.interfaces, GLib::TypePlugin.gtype)
+    end
   end
 
-  def setup
-    @provider = MyClass.new
-  end
+  sub_test_case "do not register included non-GType interfaces" do
+    class MyEnumerableClass < GLib::Object
+      include Enumerable
 
-  def test_class_size
-    assert_equal(GLib::Object.gtype.class_size, MyClass.gtype.class_size)
-  end
+      type_register
+    end
 
-  def test_registered_ancestors
-    gtype = MyClass.gtype
-    assert_include(gtype.ancestors, GLib::Object.gtype)
-  end
-
-  def test_registered_interfaces
-    gtype = MyClass.gtype
-    assert_include(gtype.interfaces, GLib::TypePlugin.gtype)
+    def test_registered_interfaces
+      gtype = MyEnumerableClass.gtype
+      assert_include(MyEnumerableClass.included_modules, Enumerable)
+      assert_equal([], gtype.interfaces)
+    end
   end
 end
