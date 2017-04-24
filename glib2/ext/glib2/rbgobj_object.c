@@ -987,6 +987,7 @@ rbgobj_register_type(VALUE klass, VALUE type_name, GClassInitFunc class_init)
 {
     GType parent_type;
     GTypeInfo *info;
+    VALUE interface_modules;
 
     {
         const RGObjClassInfo *cinfo = rbgobj_lookup_class(klass);
@@ -999,11 +1000,16 @@ rbgobj_register_type(VALUE klass, VALUE type_name, GClassInitFunc class_init)
     {
         VALUE superclass = rb_funcall(klass, rb_intern("superclass"), 0);
         const RGObjClassInfo *cinfo = rbgobj_lookup_class(superclass);
+        VALUE all_modules = rb_funcall(klass, rb_intern("included_modules"), 0);
+        VALUE super_modules = rb_funcall(superclass, rb_intern("included_modules"), 0);
+
         if (cinfo->klass != superclass)
             rb_raise(rb_eTypeError,
                      "super class must be registered to GLib: <%s>",
                      RBG_INSPECT(superclass));
         parent_type = cinfo->gtype;
+
+        interface_modules = rb_funcall(all_modules, rb_intern("-"), 1, super_modules);
     }
 
     if (NIL_P(type_name)) {
@@ -1051,6 +1057,27 @@ rbgobj_register_type(VALUE klass, VALUE type_name, GClassInitFunc class_init)
         }
 
         rbgobj_register_class(klass, type, TRUE, TRUE);
+
+        {
+            int length;
+            int i;
+
+            length = RARRAY_LEN(interface_modules);
+
+            for(i = 0; i < length; i++) {
+                VALUE entry = rb_ary_entry(interface_modules, i);
+                if(entry != rbgobj_mInterface) {
+                    GType interface_type = CLASS2GTYPE(entry);
+                    GInterfaceInfo *interface_info = g_new0(GInterfaceInfo, 1);
+
+                    interface_info->interface_init     = NULL;
+                    interface_info->interface_finalize = NULL;
+                    interface_info->interface_data     = NULL;
+
+                    g_type_add_interface_static(type, interface_type, interface_info);
+                }
+            };
+        }
 
         {
             RGObjClassInfo *cinfo = (RGObjClassInfo *)rbgobj_lookup_class(klass);
