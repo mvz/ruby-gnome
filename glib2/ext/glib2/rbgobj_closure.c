@@ -202,6 +202,9 @@ gr_closure_holder_free(void *data)
 
     GClosure *closure = (GClosure *)rclosure;
     gboolean last_reference = (closure->ref_count == 1);
+    if (closure->ref_count == 0) {
+      printf("Reference count is 0");
+    }
     g_closure_unref(closure);
     if (!last_reference) {
         g_closure_invalidate(closure);
