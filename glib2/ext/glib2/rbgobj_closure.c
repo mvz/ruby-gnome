@@ -246,6 +246,7 @@ g_rclosure_new_raw(VALUE callback_proc,
     g_closure_sink(closure);
     g_closure_set_marshal(closure, &rclosure_marshal);
     g_closure_add_invalidate_notifier(closure, NULL, rclosure_invalidate);
+    g_closure_add_finalize_notifier(closure, NULL, rclosure_invalidate);
 
     return closure;
 }
