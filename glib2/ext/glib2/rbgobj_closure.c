@@ -165,9 +165,10 @@ rclosure_invalidate(G_GNUC_UNUSED gpointer data, GClosure *closure)
     printf("Invalidating closure with refcount %i\n", closure->ref_count);
     GList *next;
     for (next = rclosure->objects; next; next = next->next) {
-        printf("Freeing an object\n");
+        printf("About to free an object referenc\n");
         GObject *object = G_OBJECT(next->data);
         g_object_weak_unref(object, rclosure_weak_notify, rclosure);
+        printf("Getting the Ruby object\n");
         VALUE obj = rbgobj_ruby_object_from_instance2(object, FALSE);
         if (!NIL_P(rclosure->rb_holder) && !NIL_P(obj)) {
             rbgobj_object_remove_relative(obj, rclosure->rb_holder);
