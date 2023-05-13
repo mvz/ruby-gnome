@@ -162,6 +162,7 @@ rclosure_invalidate(G_GNUC_UNUSED gpointer data, GClosure *closure)
 {
     GRClosure *rclosure = (GRClosure *)closure;
 
+    printf("Invalidating closure with refcount %i\n", closure->ref_count);
     GList *next;
     for (next = rclosure->objects; next; next = next->next) {
         GObject *object = G_OBJECT(next->data);
@@ -172,9 +173,11 @@ rclosure_invalidate(G_GNUC_UNUSED gpointer data, GClosure *closure)
         }
     }
     g_list_free(rclosure->objects);
+    printf("Setting objects to NULL\n");
     rclosure->objects = NULL;
 
     if (!NIL_P(rclosure->rb_holder)) {
+        printf("Setting rb_holder to nil\n");
         RTYPEDDATA_DATA(rclosure->rb_holder) = NULL;
         rclosure->rb_holder = Qnil;
     }
@@ -202,7 +205,7 @@ gr_closure_holder_free(void *data)
 
     GClosure *closure = (GClosure *)rclosure;
     gboolean last_reference = (closure->ref_count == 1);
-    printf("Reference count is %i", closure->ref_count);
+    printf("Reference count is %i\n", closure->ref_count);
     g_closure_unref(closure);
     if (!last_reference) {
         g_closure_invalidate(closure);
