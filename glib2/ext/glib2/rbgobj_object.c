@@ -137,10 +137,16 @@ rbgobj_object_remove_relative(VALUE rb_gobject, VALUE rb_relative)
 {
     gobj_holder *holder;
 
-    const char *name = RTYPEDDATA_TYPE(rb_gobject)->wrap_struct_name;
-    const char *parent_name = RTYPEDDATA_TYPE(rb_gobject)->parent->wrap_struct_name;
 
-    printf("Name: %s, parent name: %s\n", name, parent_name);
+    rb_data_type_t *data_type = RTYPEDDATA_TYPE(rb_gobject);
+    const char *name = data_type->wrap_struct_name;
+    printf("Name: %s\n", name);
+    if (data_type->parent) {
+      const char *parent_name = data_type->parent->wrap_struct_name;
+      printf("Parent name: %s\n", parent_name);
+    } else {
+      printf("Parent not set!\n");
+    }
 
     TypedData_Get_Struct(rb_gobject,
                          gobj_holder,
