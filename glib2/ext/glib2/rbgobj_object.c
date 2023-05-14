@@ -140,10 +140,19 @@ rbgobj_object_remove_relative(VALUE rb_gobject, VALUE rb_relative)
 
     const rb_data_type_t *data_type = RTYPEDDATA_TYPE(rb_gobject);
     const char *name = data_type->wrap_struct_name;
-    printf("Name: %s\n", name);
+    if (name) {
+      printf("Name: %s\n", name);
+    } else {
+      printf("No name.\n");
+    }
+
     if (data_type->parent) {
       const char *parent_name = data_type->parent->wrap_struct_name;
-      printf("Parent name: %s\n", parent_name);
+      if (parent_name) {
+        printf("Parent name: %s\n", parent_name);
+      } else {
+        printf("Parent has no name.\n");
+      }
     } else {
       printf("Parent not set!\n");
     }
