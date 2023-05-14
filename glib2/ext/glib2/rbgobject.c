@@ -133,10 +133,8 @@ rbgobj_ruby_object_from_instance2(gpointer instance, gboolean alloc)
 
     switch (G_TYPE_FUNDAMENTAL(type)) {
     case G_TYPE_OBJECT:
-        printf("It's a GObject!\n");
         return rbgobj_get_ruby_object_from_gobject(instance, alloc);
     case G_TYPE_PARAM:
-        printf("It's a GTypeParam!\n");
         return rbgobj_get_ruby_object_from_param_spec(instance, alloc);
     default:
         if (alloc) {

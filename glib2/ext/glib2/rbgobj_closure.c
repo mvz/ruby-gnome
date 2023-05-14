@@ -162,28 +162,19 @@ rclosure_invalidate(G_GNUC_UNUSED gpointer data, GClosure *closure)
 {
     GRClosure *rclosure = (GRClosure *)closure;
 
-    printf("Invalidating closure with refcount %i\n", closure->ref_count);
     GList *next;
     for (next = rclosure->objects; next; next = next->next) {
-        printf("About to free an object referenc\n");
         GObject *object = G_OBJECT(next->data);
         g_object_weak_unref(object, rclosure_weak_notify, rclosure);
-        printf("Getting the Ruby object\n");
         VALUE obj = rbgobj_ruby_object_from_instance2(object, FALSE);
-        printf("Got the Ruby object\n");
         if (!NIL_P(rclosure->rb_holder) && !NIL_P(obj)) {
-            printf("Calling rbgobj_remove_relative\n");
             rbgobj_remove_relative(obj, id_closures, rclosure->rb_holder);
         }
-        printf("Freed the object\n");
     }
-    printf("Freeing the objects list\n");
     g_list_free(rclosure->objects);
-    printf("Setting objects to NULL\n");
     rclosure->objects = NULL;
 
     if (!NIL_P(rclosure->rb_holder)) {
-        printf("Setting rb_holder to nil\n");
         RTYPEDDATA_DATA(rclosure->rb_holder) = NULL;
         rclosure->rb_holder = Qnil;
     }
@@ -211,7 +202,6 @@ gr_closure_holder_free(void *data)
 
     GClosure *closure = (GClosure *)rclosure;
     gboolean last_reference = (closure->ref_count == 1);
-    printf("Reference count is %i\n", closure->ref_count);
     g_closure_unref(closure);
     if (!last_reference) {
         g_closure_invalidate(closure);
@@ -253,7 +243,6 @@ g_rclosure_new_raw(VALUE callback_proc,
     g_closure_sink(closure);
     g_closure_set_marshal(closure, &rclosure_marshal);
     g_closure_add_invalidate_notifier(closure, NULL, rclosure_invalidate);
-    g_closure_add_finalize_notifier(closure, NULL, rclosure_invalidate);
 
     return closure;
 }
