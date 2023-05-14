@@ -140,13 +140,13 @@ rbgobj_object_remove_relative(VALUE rb_gobject, VALUE rb_relative)
     const char *name = RTYPEDDATA_TYPE(rb_gobject)->wrap_struct_name;
     const char *parent_name = RTYPEDDATA_TYPE(rb_gobject)->parent->wrap_struct_name;
 
-    printf("Name: %s", name);
-    printf("Parent name: %s", parent_name);
+    printf("Name: %s, parent name: %s\n", name, parent_name);
 
     TypedData_Get_Struct(rb_gobject,
                          gobj_holder,
                          &rg_glib_object_type,
                          holder);
+    printf("Got struct\n");
     if (holder->rb_relatives) {
         g_hash_table_remove(holder->rb_relatives,
                             (gpointer)(rb_relative));
