@@ -138,7 +138,7 @@ rbgobj_object_remove_relative(VALUE rb_gobject, VALUE rb_relative)
     gobj_holder *holder;
 
 
-    rb_data_type_t *data_type = RTYPEDDATA_TYPE(rb_gobject);
+    const rb_data_type_t *data_type = RTYPEDDATA_TYPE(rb_gobject);
     const char *name = data_type->wrap_struct_name;
     printf("Name: %s\n", name);
     if (data_type->parent) {
