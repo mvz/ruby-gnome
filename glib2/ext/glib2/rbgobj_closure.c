@@ -172,8 +172,8 @@ rclosure_invalidate(G_GNUC_UNUSED gpointer data, GClosure *closure)
         VALUE obj = rbgobj_ruby_object_from_instance2(object, FALSE);
         printf("Got the Ruby object\n");
         if (!NIL_P(rclosure->rb_holder) && !NIL_P(obj)) {
-            printf("Calling rbgobj_object_remove_relative\n");
-            rbgobj_object_remove_relative(obj, rclosure->rb_holder);
+            printf("Calling rbgobj_remove_relative\n");
+            rbgobj_remove_relative(obj, id_closures, rclosure->rb_holder);
         }
         printf("Freed the object\n");
     }
