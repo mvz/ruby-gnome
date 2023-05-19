@@ -146,6 +146,8 @@ extern void rbgobj_instance_unref(gpointer instance);
 
 extern void rbgobj_object_add_relative(VALUE rb_gobject,
                                        VALUE rb_relative);
+extern void rbgobj_gobject_remove_relative(GObject *gobject,
+                                          VALUE rb_relative);
 extern void rbgobj_object_remove_relative(VALUE rb_gobject,
                                           VALUE rb_relative);
 extern void rbgobj_object_remove_relatives(VALUE rb_gobject,
